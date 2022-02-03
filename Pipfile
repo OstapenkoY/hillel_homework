@@ -10,6 +10,7 @@ faker = "*"
 webargs = "*"
 pandas = "*"
 psutil = "*"
+where = "*"
 
 [dev-packages]
 pytest = "*"

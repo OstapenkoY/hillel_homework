@@ -122,10 +122,12 @@ def get_all_customers(first_name, last_name):
     if last_name:
         fields["LastName"] = last_name
 
-    query += " WHERE " + " AND ".join(
-        f"{key}='{value}'" for key, value in fields.items()
-    )
-    records = execute_query(query=query)
+    if fields:
+        query += " WHERE " + " AND ".join(
+            f"{key}=?" for key in fields.keys()
+        )
+
+    records = execute_query(query=query, args=tuple(fields.values()))
 
     return format_records(records)
 
@@ -136,6 +138,7 @@ def order_price():
     # by default all countries
     # join two tables invoices and invoices_items
     pass
+
 
 def get_all_info_about_track():
     # join all possible tables and show all possible
@@ -148,5 +151,6 @@ def get_all_info_about_track():
     # show time of all tracks of all albums
     # info about all tracks
     pass
+
 
 app.run(port=5001, debug=True)
