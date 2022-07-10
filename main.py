@@ -13,7 +13,7 @@ from database_handler import execute_query
 from webargs import validate, fields
 from webargs.flaskparser import use_kwargs
 
-from utils import format_records
+from utils import format_records, my_format_records
 
 app = Flask(__name__)
 
@@ -144,7 +144,7 @@ def get_all_customers(first_name, last_name):
     location="query"
 )
 def order_price(country):
-    query = f"SELECT invoices.BillingCountry, round(sum(invoice_items.UnitPrice), 2)  \
+    query = "SELECT invoices.BillingCountry, round(sum(invoice_items.UnitPrice), 2)  \
                 FROM invoice_items \
                 JOIN invoices ON invoice_items.InvoiceId = invoices.InvoiceId "
     fields = {}
@@ -155,7 +155,6 @@ def order_price(country):
     if fields:
         query += " AND " + ''.join(f"{key}=?" for key in fields.keys()) + " GROUP BY invoices.BillingCountry;"
 
-
         records = execute_query(query=query, args=tuple(fields.values()))
         return format_records(records)
     else:
@@ -165,18 +164,48 @@ def order_price(country):
         return format_records(records)
 
 
+@app.route("/track-info")
+@use_kwargs(
+    {
+        "id": fields.Str(
+            required=False,
+            missing=None,
+            validate=[validate.Regexp("^[a-zA-Z]*")]
+        )
+    },
+    location="query"
+)
+def get_all_info_about_track(id):
+    query = "SELECT tracks.TrackID, tracks.Composer, tracks.Name AS TrackName, tracks.UnitPrice, \
+                    tracks.Milliseconds, tracks.Bytes, albums.Title AS AlbumTitle, artists.Name AS ArtistName, \
+                    genres.Name AS Genre, media_types.Name AS MediaType \
+            FROM tracks JOIN albums, artists, genres, media_types \
+                WHERE albums.AlbumId = tracks.AlbumId \
+                    AND albums.ArtistId = artists.ArtistId AND tracks.GenreId = genres.GenreId \
+                    AND tracks.MediaTypeId = media_types.MediaTypeId"
+    fields = {}
 
-def get_all_info_about_track():
-    # join all possible tables and show all possible
-    # info about all tracks
-    pass
+    if id:
+        try:
+            int(id)
+            fields['tracks.TrackID'] = id
+        except ValueError:
+            return '<h3>Id must be numeric</h3>'
+    else:
+        return '<h3>Enter track id</h3>'
 
+    query += " AND " + ''.join(f"{key}=?" for key in fields.keys())
+    records = execute_query(query=query, args=tuple(fields.values()))
+    return my_format_records(records)
 
-def get_all_info_about_track():
-    # *
-    # show time of all tracks of all albums
-    # info about all tracks
-    pass
+@app.route("/total-time")
+def get_total_track_time():
+    query = 'SELECT SUM(Milliseconds) FROM tracks;'
+    records = execute_query(query=query, args=())
+    hours = int(records[0][0]) / 3600000
+    minutes = int(str(hours).split('.')[1]) * 60
+
+    return f"<h3>Total tracks time: {str(hours).split('.')[0]} hours {str(minutes).split('.')[0][:2]} minutes</h3>"
 
 
 app.run(port=5001, debug=True)
