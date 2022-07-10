@@ -132,12 +132,38 @@ def get_all_customers(first_name, last_name):
     return format_records(records)
 
 
-def order_price():
-    #  UnitPrice * Quantity - show on page.
-    #  Add possibility to get data by Country
-    # by default all countries
-    # join two tables invoices and invoices_items
-    pass
+@app.route("/order-price")
+@use_kwargs(
+    {
+        "country": fields.Str(
+            required=False,
+            missing=None,
+            validate=[validate.Regexp("^[0-9]*")]
+        )
+    },
+    location="query"
+)
+def order_price(country):
+    query = f"SELECT invoices.BillingCountry, round(sum(invoice_items.UnitPrice), 2)  \
+                FROM invoice_items \
+                JOIN invoices ON invoice_items.InvoiceId = invoices.InvoiceId "
+    fields = {}
+
+    if country:
+        fields['invoices.BillingCountry'] = country
+
+    if fields:
+        query += " AND " + ''.join(f"{key}=?" for key in fields.keys()) + " GROUP BY invoices.BillingCountry;"
+
+
+        records = execute_query(query=query, args=tuple(fields.values()))
+        return format_records(records)
+    else:
+        query += " GROUP BY invoices.BillingCountry;"
+
+        records = execute_query(query=query, args=tuple(fields.values()))
+        return format_records(records)
+
 
 
 def get_all_info_about_track():
