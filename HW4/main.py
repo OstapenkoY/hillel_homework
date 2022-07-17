@@ -55,7 +55,7 @@ def get_all_info_about_track(id):
                WHERE albums.AlbumId = tracks.AlbumId 
                AND albums.ArtistId = artists.ArtistId AND tracks.GenreId = genres.GenreId 
                AND tracks.MediaTypeId = media_types.MediaTypeId"""
-    query += " AND " + f"tracks.TrackID='{id}'"
+    query += f" AND tracks.TrackID='{id}'"
     records = execute_query(query=query)
     return track_info_format_records(records)
 
