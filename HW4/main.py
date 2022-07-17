@@ -64,10 +64,11 @@ def get_all_info_about_track(id):
 def get_total_track_time():
     query = 'SELECT SUM(Milliseconds) FROM tracks;'
     records = execute_query(query=query, args=())
-    hours = int(records[0][0]) / 3600000
-    minutes = int(str(hours).split('.')[1]) * 60
+    total_track_time = timedelta(milliseconds=records[0][0])
+    hours = int(total_track_time.total_seconds() / 3600)
+    minutes = int((total_track_time - timedelta(hours=hours)).total_seconds() / 60)
 
-    return f"<h3>Total tracks time: {str(hours).split('.')[0]} hours {str(minutes).split('.')[0][:2]} minutes</h3>"
+    return f"<h3>Total tracks time: {hours} hours {minutes} minutes</h3>"
 
 
 app.run(port=5001, debug=True)
