@@ -43,8 +43,7 @@ def order_price(country):
 @app.route("/track-info")
 @use_kwargs(
     {
-        "id": fields.Int(required=False,
-                         load_default=None)
+        "id": fields.Int(required=True)
     },
     location="query"
 )
