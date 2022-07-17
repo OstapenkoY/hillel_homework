@@ -19,6 +19,7 @@ def execute_query(query, args=()):
 
 app = Flask(__name__)
 
+
 @app.route("/order-price")
 @use_kwargs(
     {
