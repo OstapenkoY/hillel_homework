@@ -33,7 +33,7 @@ def order_price(country):
                FROM invoice_items 
                JOIN invoices ON invoice_items.InvoiceId = invoices.InvoiceId"""
     if country:
-        query += " AND " + f"invoices.BillingCountry='{country}'" + " GROUP BY invoices.BillingCountry;"
+        query += f" AND invoices.BillingCountry='{country}' GROUP BY invoices.BillingCountry;"
     else:
         query += " GROUP BY invoices.BillingCountry;"
     records = execute_query(query)
