@@ -71,6 +71,7 @@ def get_total_track_time():
     return f"<h3>Total tracks time: {hours} hours {minutes} minutes</h3>"
 
 
-app.run(port=5001, debug=True)
+if __name__ == '__main__':
+    app.run(port=5001, debug=True)
 
 
