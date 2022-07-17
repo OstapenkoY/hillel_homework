@@ -16,6 +16,7 @@ def execute_query(query, args=()):
         records = cursor.fetchall()
     return records
 
+
 app = Flask(__name__)
 
 @app.route("/order-price")
