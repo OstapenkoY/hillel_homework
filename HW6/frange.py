@@ -1,7 +1,10 @@
 class Frange:
-    def __init__(self, *args):
-        self.step = 1
-        self.start = 0
+    def __init__(self, *args, start=0, stop=0, step=1):
+        self.start = start
+        self.stop = stop
+        self.step = step
+        if len(args) > 3:
+            raise TypeError('The number of arguments cannot exceed 3')
         if len(args) == 3:
             self.start, self.stop, self.step = args
         if len(args) == 2:
@@ -24,8 +27,6 @@ class Frange:
             if value <= self.stop:
                 raise StopIteration
         return value
-
-
 
 assert(list(Frange(5)) == [0, 1, 2, 3, 4])
 assert(list(Frange(2, 5)) == [2, 3, 4])
